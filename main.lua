@@ -23,7 +23,7 @@
 ------------------------------------------------------------------------------------------------------------------------
 
 --- Application control and information
-local WIDGET_VERSION          = "1.0.0"                                 -- version information
+local WIDGET_VERSION          = "1.1.0"                                 -- version information
 local WIDGET_KEY              = "SOUNDSQ"                               -- unique widget key (max. 7 characters)
 local WIDGET_AUTOR            = "Andreas Kuhl (github.com/andreaskuhl)" -- author information
 local DEBUG_MODE              = false                                   -- true: show debug information, false: release mode
@@ -138,13 +138,14 @@ local function create()
         widgetFontSizeIndex = FONT_SIZE_INDEX_DEFAULT, -- index of font size
         widgetBgColor       = BG_COLOR_WIDGET_DEFAULT, -- widget background color
         widgetTxColor       = TX_COLOR_WIDGET_DEFAULT, -- widget text color
+
+        footerShow          = true,                    -- footer show switch
         footerTxColor       = TX_COLOR_FOOTER_DEFAULT, -- widget text color
 
-
-        titleShow     = true,                   -- title show switch
-        titleColorUse = true,                   -- title color switch
-        titleBgColor  = BG_COLOR_TITLE_DEFAULT, -- title background color
-        titleTxColor  = TX_COLOR_TITLE_DEFAULT, -- title text color
+        titleShow           = true,                    -- title show switch
+        titleColorUse       = true,                    -- title color switch
+        titleBgColor        = BG_COLOR_TITLE_DEFAULT,  -- title background color
+        titleTxColor        = TX_COLOR_TITLE_DEFAULT,  -- title text color
     }
 end
 
@@ -157,7 +158,7 @@ local function wakeup(widget)
         return
     end
 
-    -- check reset
+    -- check sourceReset
     if wHelper.existSource(widget.sourceReset) then
         if widget.sourceReset:value() >= 0 then
             widget.resetPressed = true
@@ -168,7 +169,7 @@ local function wakeup(widget)
         end
     end
 
-    -- check previous
+    -- check sourcePrev (previous)
     if wHelper.existSource(widget.sourcePrev) then
         if widget.sourcePrev:value() >= 0 then
             widget.prevPressed = true
@@ -181,7 +182,7 @@ local function wakeup(widget)
         end
     end
 
-    -- check play
+    -- check sourcePlay
     if wHelper.existSource(widget.sourcePlay) then
         if widget.sourcePlay:value() >= 0 then
             widget.playPressed = true
@@ -230,6 +231,8 @@ local function paint(widget)
     --- Paint footer text.
     local function paintFooter()
         -- wHelper.Debug:new(widget.no, "paintFooter"):info()
+
+        if not widget.footerShow then return end
 
         -- paint footer with widget background color
         local separator = "   " -- separator between the footer in the footer
@@ -345,6 +348,7 @@ local function configure(widget)
 
     -- footer
     wConfig.startPanel("Footer")
+    wConfig.addBooleanField("footerShow")
     wConfig.addColorField("footerTxColor")
     wConfig.endPanel()
 
@@ -377,6 +381,9 @@ local function write(widget)
     wStorage.write("widgetFontSizeIndex")
     wStorage.write("widgetBgColor")
     wStorage.write("widgetTxColor")
+
+    -- footer
+    wStorage.write("footerShow")
     wStorage.write("footerTxColor")
 
     -- title
@@ -415,6 +422,11 @@ local function read(widget)
         wStorage.read("widgetFontSizeIndex")
         wStorage.read("widgetBgColor")
         wStorage.read("widgetTxColor")
+
+        -- footer
+        if versionNumber >=  10100 then -- v1.1.0 or later
+            wStorage.read("footerShow")
+        end
         wStorage.read("footerTxColor")
 
         -- title

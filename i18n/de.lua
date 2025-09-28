@@ -2,6 +2,7 @@ return {
   WidgetName = "Sound-Sequenzer",
   Author = "Autor",
   Footer = "Fußzeile",
+  FooterShow = "Fußzeile anzeigen",
   FooterTxColor = "Fußzeile Textfarbe",
   Info = "Information",
   NoSourcePlay = "Play-Quelle fehlt!",

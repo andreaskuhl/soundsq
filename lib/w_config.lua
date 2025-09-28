@@ -40,15 +40,8 @@ local wHelper = {} -- helper library
 local CFL     = {} -- capitalize first letter function
 
 -- local variables
-local line    = {} -- form line
-
-function wConfig.existWidgetKey(functionName, key)
-    if widget[key] ~= nil then return true end
-    wHelper.Debug:new({ widgetNo = widget.no, widgetFunction = functionName, debugInit = false }):error(
-        "Widget key '" ..
-        key .. "' not found!")
-    return false
-end
+local line    = nil -- form line
+local panel   = nil -- form panel
 
 -----------------------------------------------------------------------------------------------------------------------
 --- Init with actual form and widget
@@ -58,11 +51,46 @@ function wConfig.init(parameters)
     STR = parameters.STR
 end
 
+-----------------------------------------------------------------------------------------------------------------------
+--- Check if widget key exists
+function wConfig.existWidgetKey(functionName, key)
+    if widget[key] ~= nil then return true end
+    wHelper.Debug:new({ widgetNo = widget.no, widgetFunction = functionName, debugInit = false }):error(
+        "Widget key '" ..
+        key .. "' not found!")
+    return false
+end
+
+------------------------------------------------------------------------------------------------------------------------
+--- Start panel
+function wConfig.startPanel(title)
+    panel = form.addExpansionPanel(STR(CFL(title)))
+    panel:open(false)
+end
+
+------------------------------------------------------------------------------------------------------------------------
+--- End panel
+function wConfig.endPanel()
+    panel = nil
+end
+
+------------------------------------------------------------------------------------------------------------------------
+--- Add line
+function wConfig.addLine(key)
+    local line
+    if panel then
+        line = panel:addLine(STR(CFL(key)))
+    else
+        line = form.addLine(STR(CFL(key)))
+    end
+    return line
+end
+
 ------------------------------------------------------------------------------------------------------------------------
 --- Add source field
 function wConfig.addSourceField(key)
     -- if not wConfig.existWidgetKey("addSourceField", key) then return end
-    line = form.addLine(STR(CFL(key)))
+    line = wConfig.addLine (CFL(key))
     form.addSourceField(line, nil, function() return widget[key] end, function(value) widget[key] = value end)
 end
 
@@ -70,7 +98,7 @@ end
 --- Add choice field
 function wConfig.addChoiceField(key, list)
     if not wConfig.existWidgetKey("addChoiceField", key) then return end
-    line = form.addLine(STR(CFL(key)))
+    line = wConfig.addLine (CFL(key))
     form.addChoiceField(line, nil, list, function() return widget[key] end, function(value) widget[key] = value end)
 end
 
@@ -78,7 +106,7 @@ end
 --- Add boolean field
 function wConfig.addBooleanField(key)
     if not wConfig.existWidgetKey("addBooleanField", key) then return end
-    line = form.addLine(STR(CFL(key)))
+    line = wConfig.addLine (CFL(key))
     form.addBooleanField(line, nil, function() return widget[key] end, function(value) widget[key] = value end)
 end
 
@@ -86,7 +114,7 @@ end
 --- Add text field
 function wConfig.addTextField(key)
     if not wConfig.existWidgetKey("addTextField", key) then return end
-    line = form.addLine(STR(CFL(key)))
+    line = wConfig.addLine (CFL(key))
     form.addTextField(line, nil, function() return widget[key] end, function(value) widget[key] = value end)
 end
 
@@ -94,14 +122,14 @@ end
 --- Add color field
 function wConfig.addColorField(key)
     if not wConfig.existWidgetKey("addColorField", key) then return end
-    line = form.addLine(STR(CFL(key)))
+    line = wConfig.addLine (CFL(key))
     form.addColorField(line, nil, function() return widget[key] end, function(value) widget[key] = value end)
 end
 
 ------------------------------------------------------------------------------------------------------------------------
 --- Add static text output.
 function wConfig.addStaticText(title, text)
-    line = form.addLine(STR(title))
+    line = wConfig.addLine (title)
     form.addStaticText(line, nil, text)
 end
 

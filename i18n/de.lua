@@ -1,7 +1,9 @@
 return {
   WidgetName = "Sound-Sequenzer",
   Author = "Autor",
+  Footer = "Fußzeile",
   FooterTxColor = "Fußzeile Textfarbe",
+  Info = "Information",
   NoSourcePlay = "Play-Quelle fehlt!",
   NoSoundFile = "Keine passenden Sound-Dateien!",
   Prefix = "Präfix Sound-Dateien",
@@ -12,6 +14,7 @@ return {
   SourcePlay = "Quelle Play",
   SourcePrev = "Quelle Previous",
   SourceReset = "Quelle Reset",
+  Title="Titel",
   TitleBgColor = "Titel Hintergrundfarbe",
   TitleColorUse = "Titelfarben nutzen",
   TitleShow = "Titel anzeigen",
@@ -21,5 +24,5 @@ return {
   Widget = "Widget",
   WidgetBgColor = "Widget Hintergrundfarbe",
   WidgetFontSizeIndex = "Widget Schriftgröße",
-  WidgetTxColor = "Titel Textfarbe",
+  WidgetTxColor = "Widget Textfarbe",
 }

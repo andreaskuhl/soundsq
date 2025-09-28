@@ -329,21 +329,31 @@ local function configure(widget)
     wConfig.addTextField("prefix")
 
     -- widget
+    wConfig.startPanel("Widget")
     wConfig.addChoiceField("widgetFontSizeIndex", FONT_SIZE_SELECTION)
     wConfig.addColorField("widgetBgColor")
     wConfig.addColorField("widgetTxColor")
-    wConfig.addColorField("footerTxColor")
+    wConfig.endPanel()
 
     -- title
+    wConfig.startPanel("Title")
     wConfig.addBooleanField("titleShow")
     wConfig.addBooleanField("titleColorUse")
     wConfig.addColorField("titleBgColor")
     wConfig.addColorField("titleTxColor")
+    wConfig.endPanel()
+
+    -- footer
+    wConfig.startPanel("Footer")
+    wConfig.addColorField("footerTxColor")
+    wConfig.endPanel()
 
     -- widget Info
+    wConfig.startPanel("Info")
     wConfig.addStaticText("Widget", STR("WidgetName"))
     wConfig.addStaticText("Version", WIDGET_VERSION)
     wConfig.addStaticText("Author", WIDGET_AUTOR)
+    wConfig.endPanel()
 end
 
 ------------------------------------------------------------------------------------------------------------------------

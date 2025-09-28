@@ -1,7 +1,9 @@
 return {
   WidgetName = "Sound Sequencer",
   Author = "Author",
+  Footer = "Footer",
   FooterTxColor = "Footer Text Color",
+  Info="Information",
   NoSourcePlay = "Play Source missing!",
   NoSoundFile = "No matching sound files!",
   Prefix = "Sound File Prefix",
@@ -12,6 +14,7 @@ return {
   SourcePlay = "Source Play",
   SourcePrev = "Source Previous",
   SourceReset = "Source Reset",
+  Title="Title",
   TitleBgColor = "Title Background Color",
   TitleColorUse = "Use Title Colors",
   TitleShow = "Show Title",

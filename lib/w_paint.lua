@@ -5,10 +5,10 @@
 ---  wPaint library with functions for painting title, footer and center text in the widget:
 ---
 ---    init(parameters)
----    textCentered(text, fontSize, verticalAlign, shiftLine)
+---    text(text, fontSize, horizontalAlign, verticalAlign, shiftLine)
 ---    title(titleText, titleBGColor, titleTxColor)
 ---    footer(footerText, footerBGColor, footerTxColor)
----    widgetText(widgetText, fontSize)
+---    widgetText(widgetText, fontSize, horizontalAlign, verticalAlign, shiftLine)
 ---    return function(parameters)
 ---
 ---  Version:                 1.1.0
@@ -28,9 +28,11 @@ local wPaint = {
     titleHeight   = 0, -- height of title box
     footerHeight  = 0, -- height of footer box
 
-    -- Vertical alignment constants for function wPaint.textCentered()
-    FREE_ABOVE    = 3, -- pixel free space at above title and/or text
-    FREE_BELOW    = 3, -- pixel free space below title and/or text
+    -- Vertical alignment constants for function wPaint.text()
+    FREE_ABOVE    = 2, -- pixel free space at above
+    FREE_BELOW    = 2, -- pixel free space below
+    FREE_LEFT     = 6, -- pixel free space at left
+    FREE_RIGHT    = 6, -- pixel free space at right
     LINE_TOP      = 1, -- align top
     LINE_CENTERED = 2, -- align middle (vertical centered)
     LINE_BOTTOM   = 3, -- align bottom
@@ -53,19 +55,21 @@ function wPaint.init(parameters)
 end
 
 ---------------------------------------------------------------------------------------------------------------------
---- Paint text centered in the widget.
+--- Paint text in the widget.
 --- Parameters:
----   text         : text to draw (string)
----   fontSize     : font size (FONT_XS, FONT_S, FONT_L, FONT_STD, FONT_XL, FONT_XXL) - default: FONT_STD
----   verticalAlign: vertical alignment (LINE_ABOVE, LINE_CENTERED, LINE_BELOW) - default: LINE_CENTERED
----   shiftLine    : shift line (example: 0 = no shift, -1 = one line up, 0.5 = half line down) - default: 0
+---   text           : text to draw (string)
+---   fontSize       : font size (FONT_XS, FONT_S, FONT_L, FONT_STD, FONT_XL, FONT_XXL) - default: FONT_STD
+---   horizontalAlign: horizontal alignment (TEXT_LEFT, TEXT_CENTERED, TEXT_RIGHT) - default: TEXT_CENTERED
+---   verticalAlign  : vertical alignment (LINE_TOP, LINE_CENTERED, LINE_BOTTOM) - default: LINE_CENTERED
+---   shiftLine      : shift line (example: 0 = no shift, -1 = one line up, 0.5 = half line down) - default: 0
 --------------------------------------------------------------------------------------------------------------------
-function wPaint.textCentered(text, fontSize, verticalAlign, shiftLine)
+function wPaint.text(text, fontSize, horizontalAlign, verticalAlign, shiftLine)
     local textWidth, textHeight -- text width and height
     local textPosY              -- text y position
 
     if not helper.existText(text) then return end
     if not fontSize then fontSize = FONT_STD end
+    if not horizontalAlign then horizontalAlign = wPaint.TEXT_CENTERED end
     if not verticalAlign then verticalAlign = wPaint.LINE_CENTERED end
     if not shiftLine then shiftLine = 0 end
 
@@ -75,16 +79,28 @@ function wPaint.textCentered(text, fontSize, verticalAlign, shiftLine)
     if verticalAlign == wPaint.LINE_TOP then        -- align top
         textPosY = wPaint.FREE_ABOVE + wPaint.titleHeight
     elseif verticalAlign == wPaint.LINE_BOTTOM then -- align bottom
-        textPosY = (widget.height - textHeight - wPaint.FREE_BELOW)
+        textPosY = (widget.height - textHeight - wPaint.footerHeight - wPaint.FREE_BELOW)
     else                                            -- align centered (default)
-        textPosY = wPaint.FREE_ABOVE +
-            ((widget.height - wPaint.titleHeight - wPaint.FREE_ABOVE - wPaint.footerHeight) / 2 - textHeight / 2) +
-            wPaint.titleHeight
+        -- textPosY = wPaint.FREE_ABOVE +
+        --     ((widget.height - wPaint.titleHeight - wPaint.FREE_ABOVE - wPaint.footerHeight - wPaint.FREE_BELOW) / 2 - textHeight / 2) +
+        --     wPaint.titleHeight
+
+        local boxTop = wPaint.titleHeight + wPaint.FREE_ABOVE
+        local boxHeight = widget.height - wPaint.FREE_BELOW - wPaint.footerHeight - boxTop
+        local boxMiddle = boxTop + boxHeight / 2
+        textPosY = boxMiddle - textHeight / 2
+
     end
 
     textPosY = textPosY + (shiftLine * textHeight) -- shift line
 
-    lcd.drawText((widget.width / 2), textPosY, text, TEXT_CENTERED)
+    if horizontalAlign == TEXT_LEFT then
+        lcd.drawText(wPaint.FREE_LEFT, textPosY, text, TEXT_LEFT)
+    elseif horizontalAlign == TEXT_RIGHT then
+        lcd.drawText(widget.width - wPaint.FREE_RIGHT, textPosY, text, TEXT_RIGHT)
+    else
+        lcd.drawText((widget.width / 2), textPosY, text, TEXT_CENTERED)
+    end
 end
 
 --------------------------------------------------------------------------------------------------------------------
@@ -105,7 +121,7 @@ function wPaint.title(titleText, titleBGColor, titleTxColor)
 
     --- draw title text
     lcd.color(titleTxColor)
-    wPaint.textCentered(titleText, FONT_S, wPaint.LINE_TOP, 0)
+    wPaint.text(titleText, FONT_S, TEXT_CENTERED, wPaint.LINE_TOP, 0)
 
     wPaint.titleHeight = titleHeight
 end
@@ -130,22 +146,24 @@ function wPaint.footer(footerText, footerBGColor, footerTxColor)
     end
     --- draw footer text
     lcd.color(footerTxColor)
-    wPaint.textCentered(footerText, FONT_XS, wPaint.LINE_BOTTOM, 0)
+    wPaint.text(footerText, FONT_XS, TEXT_CENTERED, wPaint.LINE_BOTTOM, 0)
 
     wPaint.footerHeight = footerHeight
 end
 
 --------------------------------------------------------------------------------------------------------------------
 ---  wPaint multiline widget text
-function wPaint.widgetText(widgetText, fontSize)
+function wPaint.widgetText(widgetText, fontSize, horizontalAlign, verticalAlign, shiftLine)
     -- local debug = helper.Debug:new(0, "wPaint.widgetText")
     local lines = helper.splitLines(widgetText)
     local n = #lines
+
+    if not shiftLine then shiftLine = 0 end
     lcd.font(fontSize)
     for i, line in ipairs(lines) do
-        local offset = -n / 2 - 0.5 + i
-        -- debug:info( string.format("offset: %.2f | line: %s", offset, line))
-        wPaint.textCentered(line, fontSize, wPaint.LINE_CENTERED, offset)
+        local localShiftLine = -n / 2 - 0.5 + i + shiftLine
+        -- debug:info( string.format("offset: %.2f | line: %s", localOffset, line))
+        wPaint.text(line, fontSize, horizontalAlign, verticalAlign, localShiftLine)
     end
 end
 

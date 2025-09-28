@@ -1,5 +1,6 @@
 return {
   WidgetName = "Sound Sequencer",
+  Actual="Actual: ",
   Author = "Author",
   Footer = "Footer",
   FooterShow = "Show footer",

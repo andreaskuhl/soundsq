@@ -9,6 +9,8 @@
     "widget",
     "FONT_XL",
     "TEXT_CENTERED",
+    "TEXT_LEFT",
+    "TEXT_RIGHT",
     "COLOR_BLACK",
     "COLOR_BLUE",
     "COLOR_CYAN",

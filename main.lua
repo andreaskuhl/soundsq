@@ -26,7 +26,7 @@
 local WIDGET_VERSION          = "1.1.0"                                 -- version information
 local WIDGET_KEY              = "SOUNDSQ"                               -- unique widget key (max. 7 characters)
 local WIDGET_AUTOR            = "Andreas Kuhl (github.com/andreaskuhl)" -- author information
-local DEBUG_MODE              = false                                   -- true: show debug information, false: release mode
+local DEBUG_MODE              = true                                    -- true: show debug information, false: release mode
 local widgetCounter           = 0                                       -- counter for widget instances (0 = no instance)
 
 --- Libraries
@@ -252,13 +252,26 @@ local function paint(widget)
     --------------------------------------------------------------------------------------------------------------------
     ---  paint widget text
     local function paintWidgetText()
-        -- wHelper.Debug:new(widget.no, "paintWidgetText"):info()
-
-        local text = widget.soundFiles[widget.soundCounter]
-        text = STR("Next") .. string.sub(text, #widget.prefix + 1, #text - 4)
+        -- local debug = wHelper.Debug:new(widget.no, "paintWidgetText"):info()
 
         lcd.color(widget.widgetTxColor)
-        wPaint.widgetText(text, FONT_SIZES[widget.widgetFontSizeIndex])
+
+        local actualText = ""
+        local actualFontSizeIndex = widget.widgetFontSizeIndex -1
+        if actualFontSizeIndex < 1 then actualFontSizeIndex = 1 end
+
+        if widget.soundCounter > 1 then
+            actualText = widget.soundFiles[widget.soundCounter - 1]
+            actualText = string.sub(actualText, #widget.prefix + 1, #actualText - 4)
+            wPaint.widgetText(STR("Actual"), FONT_SIZES[actualFontSizeIndex], TEXT_LEFT, wPaint.LINE_TOP)
+            wPaint.widgetText(actualText, FONT_SIZES[actualFontSizeIndex], TEXT_RIGHT, wPaint.LINE_TOP)
+        end
+
+
+        local nextText = widget.soundFiles[widget.soundCounter]
+        nextText = string.sub(nextText, #widget.prefix + 1, #nextText - 4)
+        wPaint.widgetText(STR("Next"), FONT_SIZES[widget.widgetFontSizeIndex], TEXT_LEFT, wPaint.LINE_BOTTOM)
+        wPaint.widgetText(nextText, FONT_SIZES[widget.widgetFontSizeIndex], TEXT_RIGHT, wPaint.LINE_BOTTOM)
     end
 
     --------------------------------------------------------------------------------------------------------------------
@@ -424,7 +437,7 @@ local function read(widget)
         wStorage.read("widgetTxColor")
 
         -- footer
-        if versionNumber >=  10100 then -- v1.1.0 or later
+        if versionNumber >= 10100 then -- v1.1.0 or later
             wStorage.read("footerShow")
         end
         wStorage.read("footerTxColor")

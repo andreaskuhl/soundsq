@@ -60,6 +60,11 @@ def extract_str_keys_from_lua_sources(paths):
                 str_keys.add(match)
                 key_sources[match].add(path)
 
+            # wConfig.startPanel("key")
+            for match in re.findall(r'wConfig\.startPanel\s*\(\s*"([^"]+)"', content):
+                str_keys.add(match)
+                key_sources[match].add(path)
+
         except Exception as e:
             print(f"Fehler beim Lesen von {path}: {e}")
     return str_keys, key_sources

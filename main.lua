@@ -41,15 +41,18 @@ local WIDGET_NAME_MAP         = assert(loadfile("i18n/w_name.lua"))()         --
 local currentLocale           = system.getLocale()                            -- current system language
 
 --- User interface
-local FONT_SIZES              = { FONT_XS, FONT_S, FONT_L, FONT_XL, FONT_XXL }                   -- global font IDs (1-5)
-local FONT_SIZE_SELECTION     = { { "XS", 1 }, { "S", 2 }, { "M", 3 }, { "L", 4 }, { "XL", 5 } } -- list for config listbox
+local FONT_SIZES              = {
+    FONT_XS, FONT_S, FONT_STD, FONT_L, FONT_XL, FONT_XXL }                       -- global font IDs (1-5)
+local FONT_SIZE_SELECTION     = {
+    { "XS", 1 }, { "S", 2 }, { "M", 3 }, { "L", 4 }, { "XL", 5 }, { "XXL", 6 } } -- list for config listbox
 
 --- widget defaults
-local FONT_SIZE_INDEX_DEFAULT = 3                      -- font size index default
+local FONT_SIZE_INDEX_DEFAULT = 4                      -- font size index default
 local BG_COLOR_TITLE_DEFAULT  = lcd.RGB(40, 40, 40)    -- title background  -> dark gray
 local TX_COLOR_TITLE_DEFAULT  = COLOR_WHITE            -- title text        -> white
 local BG_COLOR_WIDGET_DEFAULT = COLOR_BLACK            -- widget background -> black
-local TX_COLOR_WIDGET_DEFAULT = COLOR_GREEN            -- widget text       -> green
+local TX_COLOR_ACTUAL_DEFAULT = lcd.RGB(0, 128, 0)     -- "Actual"" text    -> dark green
+local TX_COLOR_NEXT_DEFAULT   = COLOR_GREEN            -- "Next" text       -> green
 local TX_COLOR_FOOTER_DEFAULT = lcd.RGB(176, 176, 176) -- footer text       -> light gray
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -137,7 +140,10 @@ local function create()
 
         widgetFontSizeIndex = FONT_SIZE_INDEX_DEFAULT, -- index of font size
         widgetBgColor       = BG_COLOR_WIDGET_DEFAULT, -- widget background color
-        widgetTxColor       = TX_COLOR_WIDGET_DEFAULT, -- widget text color
+        actualShow          = true,                    -- actual show switch
+        actualTxColor       = TX_COLOR_ACTUAL_DEFAULT, -- "actual" text color
+        nextTxColor         = TX_COLOR_NEXT_DEFAULT,   -- "next" text color
+        reducedSortChars    = 3,                       -- reduce sort number of characters in file name for title
 
         footerShow          = true,                    -- footer show switch
         footerTxColor       = TX_COLOR_FOOTER_DEFAULT, -- widget text color
@@ -253,25 +259,27 @@ local function paint(widget)
     ---  paint widget text
     local function paintWidgetText()
         -- local debug = wHelper.Debug:new(widget.no, "paintWidgetText"):info()
+        local nextLineShift = 0
 
-        lcd.color(widget.widgetTxColor)
-
-        local actualText = ""
-        local actualFontSizeIndex = widget.widgetFontSizeIndex -1
-        if actualFontSizeIndex < 1 then actualFontSizeIndex = 1 end
-
-        if widget.soundCounter > 1 then
-            actualText = widget.soundFiles[widget.soundCounter - 1]
-            actualText = string.sub(actualText, #widget.prefix + 1, #actualText - 4)
-            wPaint.widgetText(STR("Actual"), FONT_SIZES[actualFontSizeIndex], TEXT_LEFT, wPaint.LINE_TOP)
-            wPaint.widgetText(actualText, FONT_SIZES[actualFontSizeIndex], TEXT_RIGHT, wPaint.LINE_TOP)
+        if widget.actualShow then
+            local actualText = ""
+            local actualFontSizeIndex = widget.widgetFontSizeIndex - 1
+            if actualFontSizeIndex < 1 then actualFontSizeIndex = 1 end
+            nextLineShift = 0.5
+            lcd.color(widget.actualTxColor)
+            if widget.soundCounter > 1 then
+                actualText = widget.soundFiles[widget.soundCounter - 1]
+                actualText = string.sub(actualText, #widget.prefix + widget.reducedSortChars + 1, #actualText - 4)
+                wPaint.widgetText(STR("Actual"), FONT_SIZES[actualFontSizeIndex], TEXT_LEFT, wPaint.LINE_MIDDLE, -0.5)
+                wPaint.widgetText(actualText, FONT_SIZES[actualFontSizeIndex], TEXT_RIGHT, wPaint.LINE_MIDDLE, -0.5)
+            end
         end
 
-
         local nextText = widget.soundFiles[widget.soundCounter]
-        nextText = string.sub(nextText, #widget.prefix + 1, #nextText - 4)
-        wPaint.widgetText(STR("Next"), FONT_SIZES[widget.widgetFontSizeIndex], TEXT_LEFT, wPaint.LINE_BOTTOM)
-        wPaint.widgetText(nextText, FONT_SIZES[widget.widgetFontSizeIndex], TEXT_RIGHT, wPaint.LINE_BOTTOM)
+        lcd.color(widget.nextTxColor)
+        nextText = string.sub(nextText, #widget.prefix + widget.reducedSortChars + 1, #nextText - 4)
+        wPaint.widgetText(STR("Next"), FONT_SIZES[widget.widgetFontSizeIndex], TEXT_LEFT, wPaint.LINE_MIDDLE, nextLineShift)
+        wPaint.widgetText(nextText, FONT_SIZES[widget.widgetFontSizeIndex], TEXT_RIGHT, wPaint.LINE_MIDDLE, nextLineShift)
     end
 
     --------------------------------------------------------------------------------------------------------------------
@@ -348,7 +356,10 @@ local function configure(widget)
     wConfig.startPanel("Widget")
     wConfig.addChoiceField("widgetFontSizeIndex", FONT_SIZE_SELECTION)
     wConfig.addColorField("widgetBgColor")
-    wConfig.addColorField("widgetTxColor")
+    wConfig.addBooleanField("actualShow")
+    wConfig.addColorField("actualTxColor")
+    wConfig.addColorField("nextTxColor")
+    wConfig.addNumberField("reducedSortChars", 0, 20)
     wConfig.endPanel()
 
     -- title
@@ -393,7 +404,10 @@ local function write(widget)
     -- widget
     wStorage.write("widgetFontSizeIndex")
     wStorage.write("widgetBgColor")
-    wStorage.write("widgetTxColor")
+    wStorage.write("actualShow")
+    wStorage.write("actualTxColor")
+    wStorage.write("nextTxColor")
+    wStorage.write("reducedSortChars")
 
     -- footer
     wStorage.write("footerShow")
@@ -434,7 +448,14 @@ local function read(widget)
         --  widget
         wStorage.read("widgetFontSizeIndex")
         wStorage.read("widgetBgColor")
-        wStorage.read("widgetTxColor")
+        if versionNumber >= 10100 then -- v1.1.0 or later
+            wStorage.read("actualShow")
+            wStorage.read("actualTxColor")
+            wStorage.read("nextTxColor")
+            wStorage.read("reducedSortChars")
+        else
+            wStorage.read("widgetTxColor")
+        end
 
         -- footer
         if versionNumber >= 10100 then -- v1.1.0 or later

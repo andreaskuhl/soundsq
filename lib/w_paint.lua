@@ -89,7 +89,6 @@ function wPaint.text(text, fontSize, horizontalAlign, verticalAlign, shiftLine)
         local boxHeight = widget.height - wPaint.FREE_BELOW - wPaint.footerHeight - boxTop
         local boxMiddle = boxTop + boxHeight / 2
         textPosY = boxMiddle - textHeight / 2
-
     end
 
     textPosY = textPosY + (shiftLine * textHeight) -- shift line
@@ -162,7 +161,7 @@ function wPaint.widgetText(widgetText, fontSize, horizontalAlign, verticalAlign,
     lcd.font(fontSize)
     for i, line in ipairs(lines) do
         local localShiftLine = -n / 2 - 0.5 + i + shiftLine
-        -- debug:info( string.format("offset: %.2f | line: %s", localOffset, line))
+        -- debug:info(string.format("localShiftLine: %.2f | line: %s | lineIndex: %d", localShiftLine, line, i))
         wPaint.text(line, fontSize, horizontalAlign, verticalAlign, localShiftLine)
     end
 end

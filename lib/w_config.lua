@@ -119,6 +119,14 @@ function wConfig.addTextField(key)
 end
 
 ------------------------------------------------------------------------------------------------------------------------
+--- Add number field
+function wConfig.addNumberField(key, min, max)
+    if not wConfig.existWidgetKey("addNumberField", key) then return end
+    line = wConfig.addLine (CFL(key))
+    form.addNumberField(line, nil, min, max, function() return widget[key] end, function(value) widget[key] = value end)
+end
+
+------------------------------------------------------------------------------------------------------------------------
 --- Add color field
 function wConfig.addColorField(key)
     if not wConfig.existWidgetKey("addColorField", key) then return end

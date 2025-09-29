@@ -1,8 +1,9 @@
 return {
   WidgetName = "Sound Sequencer",
   Actual = "Actual: ",
-  ActualShow = "Show actual",
-   ActualTxColor = "Text color 'Actual'",
+  ActualShow = "Show actual sound",
+  ActualNextShow = "Show 'Actual:' & 'Next:'",
+  ActualTxColor = "Text color 'Actual'",
   Author = "Author",
   Footer = "Footer",
   FooterShow = "Show footer",

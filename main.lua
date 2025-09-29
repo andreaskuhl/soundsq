@@ -141,8 +141,9 @@ local function create()
         widgetFontSizeIndex = FONT_SIZE_INDEX_DEFAULT, -- index of font size
         widgetBgColor       = BG_COLOR_WIDGET_DEFAULT, -- widget background color
         actualShow          = true,                    -- actual show switch
-        actualTxColor       = TX_COLOR_ACTUAL_DEFAULT, -- "actual" text color
-        nextTxColor         = TX_COLOR_NEXT_DEFAULT,   -- "next" text color
+        actualNextShow      = true,                    -- actual/next show switch
+        actualTxColor       = TX_COLOR_ACTUAL_DEFAULT, -- actual text color
+        nextTxColor         = TX_COLOR_NEXT_DEFAULT,   -- next text color
         reducedSortChars    = 3,                       -- reduce sort number of characters in file name for title
 
         footerShow          = true,                    -- footer show switch
@@ -270,16 +271,28 @@ local function paint(widget)
             if widget.soundCounter > 1 then
                 actualText = widget.soundFiles[widget.soundCounter - 1]
                 actualText = string.sub(actualText, #widget.prefix + widget.reducedSortChars + 1, #actualText - 4)
-                wPaint.widgetText(STR("Actual"), FONT_SIZES[actualFontSizeIndex], TEXT_LEFT, wPaint.LINE_MIDDLE, -0.5)
-                wPaint.widgetText(actualText, FONT_SIZES[actualFontSizeIndex], TEXT_RIGHT, wPaint.LINE_MIDDLE, -0.5)
+                if widget.actualNextShow then
+                    wPaint.widgetText(STR("Actual"), FONT_SIZES[actualFontSizeIndex], TEXT_LEFT, wPaint.LINE_MIDDLE, -0.5)
+                    wPaint.widgetText(actualText, FONT_SIZES[actualFontSizeIndex], TEXT_RIGHT, wPaint.LINE_MIDDLE, -0.5)
+                else
+                    wPaint.widgetText(actualText, FONT_SIZES[actualFontSizeIndex], TEXT_CENTERED, wPaint.LINE_MIDDLE,
+                        -0.5)
+                end
             end
         end
 
         local nextText = widget.soundFiles[widget.soundCounter]
         lcd.color(widget.nextTxColor)
         nextText = string.sub(nextText, #widget.prefix + widget.reducedSortChars + 1, #nextText - 4)
-        wPaint.widgetText(STR("Next"), FONT_SIZES[widget.widgetFontSizeIndex], TEXT_LEFT, wPaint.LINE_MIDDLE, nextLineShift)
-        wPaint.widgetText(nextText, FONT_SIZES[widget.widgetFontSizeIndex], TEXT_RIGHT, wPaint.LINE_MIDDLE, nextLineShift)
+        if widget.actualNextShow then
+            wPaint.widgetText(STR("Next"), FONT_SIZES[widget.widgetFontSizeIndex], TEXT_LEFT, wPaint.LINE_MIDDLE,
+                nextLineShift)
+            wPaint.widgetText(nextText, FONT_SIZES[widget.widgetFontSizeIndex], TEXT_RIGHT, wPaint.LINE_MIDDLE,
+                nextLineShift)
+        else
+            wPaint.widgetText(nextText, FONT_SIZES[widget.widgetFontSizeIndex], TEXT_CENTERED, wPaint.LINE_MIDDLE,
+                nextLineShift)
+        end
     end
 
     --------------------------------------------------------------------------------------------------------------------
@@ -357,6 +370,7 @@ local function configure(widget)
     wConfig.addChoiceField("widgetFontSizeIndex", FONT_SIZE_SELECTION)
     wConfig.addColorField("widgetBgColor")
     wConfig.addBooleanField("actualShow")
+    wConfig.addBooleanField("actualNextShow")
     wConfig.addColorField("actualTxColor")
     wConfig.addColorField("nextTxColor")
     wConfig.addNumberField("reducedSortChars", 0, 20)
@@ -405,6 +419,7 @@ local function write(widget)
     wStorage.write("widgetFontSizeIndex")
     wStorage.write("widgetBgColor")
     wStorage.write("actualShow")
+    wStorage.write("actualNextShow")
     wStorage.write("actualTxColor")
     wStorage.write("nextTxColor")
     wStorage.write("reducedSortChars")
@@ -450,6 +465,7 @@ local function read(widget)
         wStorage.read("widgetBgColor")
         if versionNumber >= 10100 then -- v1.1.0 or later
             wStorage.read("actualShow")
+            wStorage.read("actualNextShow")
             wStorage.read("actualTxColor")
             wStorage.read("nextTxColor")
             wStorage.read("reducedSortChars")

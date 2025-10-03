@@ -31,13 +31,18 @@
 "cSpell.words": [
   "abspielbereit",
   "acro",
+  "endlocal",
   "Jurisch",
   "Mössler",
+  "setlocal",
   "soundsq",
   "SOUNDSQ",
+  "TMPDIR",
   "wakeup",
   "WDGTMPL",
   "widgetname",
+  "xcopy",
+  "ZIPFILE",
   "Zurücksetz"
 ],
 "Lua.diagnostics.disable": [

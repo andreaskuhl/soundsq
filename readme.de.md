@@ -51,9 +51,9 @@ Wenn es Ihnen gefällt, können Sie es mit einer Spende unterstützen!
   - **Mehrfacheinsatz**  
   Das Widget, genauso wie die Sprachansagen & -Listen, können mehrfach eingesetzt werden, sowohl in einem Modell als auch in verschiedenen Modellen. Es sollte in einem Modell jedoch darauf geachtet werden, dass die Steuerungsbelegung (Play, Prev, Reset) in einem Modell nicht mit gleichen Quellen belegt werden.
   - **Anzeige Individualisierung** 
-  Titelzeile (Widget-Kurzename - Prefix und Index/Titelanzahl) ein/ausschalten, Fußzeile (Titelsteuerung) ein/ausschalten, getrennt wählbare Text- und Hintergrund-Farbe für Titel und Widget-Text und Fußzeile, Text "Actual:" & "Next:" ein/ausschalten
+  Titelzeile (Widget-Kurzname - Prefix und Index/Titelanzahl) ein/ausschalten, Fußzeile (Titelsteuerung) ein/ausschalten, getrennt wählbare Text- und Hintergrund-Farbe für Titel und Widget-Text und Fußzeile, Text "Actual:" & "Next:" ein/ausschalten
   - **Lokalisierung**
-  Sprachunterstützung ind Englisch (en - Standard) und Deutsch (de).
+  Sprachunterstützung in Englisch (en - Standard) und Deutsch (de).
   
 
 # Ideen zu weiteren Funktionen & Verbesserung
